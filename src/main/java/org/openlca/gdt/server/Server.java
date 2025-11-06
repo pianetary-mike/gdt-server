@@ -1,13 +1,9 @@
 package org.openlca.gdt.server;
 
+import org.openlca.core.services.ServerConfig;
+
 import io.javalin.Javalin;
 import io.javalin.http.staticfiles.Location;
-import io.javalin.plugin.bundled.CorsPluginConfig;
-import org.eclipse.jetty.server.Connector;
-import org.eclipse.jetty.server.HttpConfiguration;
-import org.eclipse.jetty.server.HttpConnectionFactory;
-import org.eclipse.jetty.server.ServerConnector;
-import org.openlca.core.services.ServerConfig;
 
 public class Server {
 
@@ -23,21 +19,14 @@ public class Server {
 		var app = Javalin.create(c -> {
 			if (config.staticDir() != null) {
 				c.staticFiles.add(
-						config.staticDir().getAbsolutePath(), Location.EXTERNAL);
+					config.staticDir().getAbsolutePath(), Location.EXTERNAL);
 			}
-			c.plugins.enableCors(cors -> cors.add(CorsPluginConfig::anyHost));
-			c.jetty.server(() -> {
-				var server = new org.eclipse.jetty.server.Server();
-				var httpConfig = new HttpConfiguration();
+			c.bundledPlugins.enableCors(cors -> cors.addRule(it -> it.anyHost()));
+			c.jetty.modifyHttpConfiguration(httpConfig -> {
 				httpConfig.setRequestHeaderSize(16384);
 				httpConfig.setResponseHeaderSize(16384);
-				var connector = new ServerConnector(
-						server, new HttpConnectionFactory(httpConfig));
-				connector.setPort(config.port());
-				server.setConnectors(new Connector[]{connector});
-				return server;
 			});
-		}).start();
+		});
 
 		app.get("/api/version", Version::get);
 
@@ -134,14 +123,14 @@ public class Server {
 		app.get("/results/{id}/state", results::getState);
 		app.get("/results/{id}/total-impacts", results::getTotalImpacts);
 
-		// register a shutdown hook for closing database and server
-		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+		// shutdown hook
+		app.events(event -> event.serverStopping(() -> {
 			try {
 				db.close();
-				app.close();
 			} catch (Exception e) {
-				System.out.println("shutdown failed: " + e.getMessage());
+				System.out.println("failed to close the database: " + e.getMessage());
 			}
 		}));
+		app.start(config.port());
 	}
 }

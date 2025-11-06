@@ -1,14 +1,16 @@
 package org.openlca.gdt.server;
 
-import com.google.gson.JsonObject;
-import io.javalin.http.Context;
 import org.openlca.jsonld.Json;
 import org.openlca.nativelib.Module;
 import org.openlca.nativelib.NativeLib;
 
+import com.google.gson.JsonObject;
+
+import io.javalin.http.Context;
+
 class Version {
 
-	private static final String VERSION = "2.0.27";
+	private static final String VERSION = "2.0.28";
 
 	static void get(Context ctx) {
 		var obj = new JsonObject();
