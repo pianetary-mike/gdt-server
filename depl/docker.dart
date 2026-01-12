@@ -64,7 +64,7 @@ class _DockerBuild {
 
   dbImage() {
     print("generate Docker file");
-    var recipe = "FROM eclipse-temurin:17-jre\n"
+    var recipe = "FROM eclipse-temurin:21-jre\n"
         "COPY gdt-server.jar /app/gdt-server.jar\n"
         "COPY lib /app/lib\n"
         "COPY native /app/native\n"
@@ -115,11 +115,11 @@ class _DockerBuild {
     }
 
     print("generate Docker images");
-    var prefix = "ghcr.io/greendelta";
+    var prefix = "gdt-server";
     [
-      ["app.Dockerfile", "${prefix}/gdt-server-app"],
-      ["lib.Dockerfile", "${prefix}/gdt-server-lib"],
-      ["native.Dockerfile", "${prefix}/gdt-server-native"],
+      ["app.Dockerfile", "${prefix}-app"],
+      ["lib.Dockerfile", "${prefix}-lib"],
+      ["native.Dockerfile", "${prefix}-native"],
     ].forEach((p) {
       var file = p[0];
       var tag = p[1];

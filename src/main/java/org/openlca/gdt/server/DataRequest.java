@@ -20,8 +20,6 @@ import org.openlca.core.model.RootEntity;
 import org.openlca.core.model.SocialIndicator;
 import org.openlca.core.model.Source;
 import org.openlca.core.model.UnitGroup;
-import org.openlca.util.Strings;
-
 class DataRequest {
 
 	@SuppressWarnings("unchecked")
@@ -41,7 +39,7 @@ class DataRequest {
 	 */
 	static String resolveId(Context ctx) {
 		var id = ctx.pathParam("id");
-		if (Strings.nullOrEmpty(id)) {
+		if (id == null || id.isEmpty()) {
 			Http.sendBadRequest(ctx, "no ID provided");
 			return null;
 		}
@@ -56,7 +54,7 @@ class DataRequest {
 	@SuppressWarnings("unchecked")
 	static <T extends RootEntity> Class<T> resolveType(Context ctx) {
 		var path = ctx.pathParam("type-path");
-		if (Strings.nullOrEmpty(path)) {
+		if (path == null || path.isEmpty()) {
 			Http.sendBadRequest(ctx, "No model path provided");
 			return null;
 		}

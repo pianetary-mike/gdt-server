@@ -37,6 +37,7 @@ class _AppBuild {
     print("  compile with Maven");
     var r = await Process.run("mvn", ["clean", "package", "-DskipTests=true"]);
     var stdout = r.stdout.toString();
+    var stderr = r.stderr.toString();
     var buildSuccess = false;
     for (var line in stdout.split("\n")) {
       if (line.trim() == "[INFO] BUILD SUCCESS") {
@@ -44,8 +45,20 @@ class _AppBuild {
         break;
       }
     }
+    // Also check stderr in case Maven outputs there
+    if (!buildSuccess) {
+      for (var line in stderr.split("\n")) {
+        if (line.trim() == "[INFO] BUILD SUCCESS") {
+          buildSuccess = true;
+          break;
+        }
+      }
+    }
     if (!buildSuccess) {
       print(stdout);
+      if (stderr.isNotEmpty) {
+        print(stderr);
+      }
       print("error: build failed");
       exit(1);
     }

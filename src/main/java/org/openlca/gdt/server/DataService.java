@@ -4,8 +4,6 @@ import io.javalin.http.Context;
 import org.openlca.core.database.IDatabase;
 import org.openlca.core.services.JsonDataService;
 import org.openlca.jsonld.Json;
-import org.openlca.util.Strings;
-
 class DataService {
 
 	private final JsonDataService service;
@@ -43,7 +41,7 @@ class DataService {
 		if (type == null)
 			return;
 		var name = ctx.pathParam("name");
-		if (Strings.nullOrEmpty(name)) {
+		if (name == null || name.isEmpty()) {
 			Http.sendBadRequest(ctx, "no name provided");
 			return;
 		}
